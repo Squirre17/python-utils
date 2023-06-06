@@ -1,0 +1,3 @@
+dist/
+squ.egg-info/
+**/__pycache__

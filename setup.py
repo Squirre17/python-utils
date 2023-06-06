@@ -8,9 +8,12 @@ setup(
     version='0.0.1',
     author='Ler2sq',
     author_email='ler2sq@gmail.com',
-    url='TODO',
+    url='https://github.com/Squirre17/python-utils',
     description=u'self-used utils',
     packages=['squ'],
-    install_requires=[],
+    install_requires=[
+        "typing",
+        "functools",
+    ],
     entry_points={}
 )
