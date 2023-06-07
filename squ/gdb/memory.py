@@ -13,12 +13,13 @@ import squ.gdb.proc as proc
 from loguru import logger
 from typing import (List, Optional, Union)
 
-from squ.gdb.config.param import Parameter
+# from squ.gdb.config.param import Parameter
 
 from squ.utils.color import Color
 from squ.gdb.address import Address
 from squ.utils.decorator import *
 from enum import Enum
+from rich.console import Console
 
 # from squ.gdb.page import Page
 from squ.backtrace import err_print_exc
@@ -34,8 +35,7 @@ class MemReader:
         try :
             val : memoryview = gdb.selected_inferior().read_memory(addr, size)
         except Exception as e :
-            log.err(f"TODO {e}")
-            traceback.print_exc()
+            Console().print_exception()
         
         # do arch convert here ,ease the burden of upstream functions
         return int.from_bytes(bytearray(val), arch.endianness)
@@ -134,8 +134,6 @@ def can_access(addr : int) -> bool:
 #     default_val  = 48,
 #     docdesc      = "the max of string length which memory read"
 # )
-
-
 
 
 # write a bytes

@@ -1,7 +1,10 @@
 import time
 import functools
+import squ.gdb.stdio
 import squ.utils.log as log
 import squ.gdb.proc as proc
+
+from rich.console    import (Console)
 
 from squ.utils.color import (Color)
 from typing          import (Callable, Any)
@@ -32,7 +35,9 @@ def debug_wrapper(func : Callable) -> Callable:
         return ret
     return wrapper
 
-import traceback
+with squ.gdb.stdio.stdio:
+    __rich_console = Console(highlight=True)
+    
 def handle_exception(func : Callable) -> Callable:
     @functools.wraps(func)
     def wrapper(*args , **kwargs) -> Any:
@@ -40,5 +45,5 @@ def handle_exception(func : Callable) -> Callable:
             return func(*args, **kwargs)
         except Exception as e :
             log.err("Exception occur!")
-            print(traceback.format_exc())
+            __rich_console.print_exception(show_locals=True)
     return wrapper

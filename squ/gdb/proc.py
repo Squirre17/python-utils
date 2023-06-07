@@ -5,6 +5,8 @@ import gdb
 import functools
 import squ.utils.log as log
 
+
+
 def is_alive() -> bool:
     return gdb.selected_thread() is not None
 
