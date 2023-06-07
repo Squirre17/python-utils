@@ -17,7 +17,7 @@ def get_current_cpu() -> int:
 pwndbg> p/x __per_cpu_offset
 $7 = {0xffff88800f400000, 0xffffffff82b01000 <repeats 63 times>}
 '''
-def per_cpu(var_ptr : gdb.Value, cpu) -> gdb.Value:
+def per_cpu(var_ptr : gdb.Value, cpu = -1) -> gdb.Value:
     '''
     pass in a per-cpu ptr, and return a derefered value
     '''

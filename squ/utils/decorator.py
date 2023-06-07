@@ -1,3 +1,4 @@
+import sys
 import time
 import functools
 import squ.gdb.stdio
@@ -46,4 +47,5 @@ def handle_exception(func : Callable) -> Callable:
         except Exception as e :
             log.err("Exception occur!")
             __rich_console.print_exception(show_locals=True)
+            sys.exit(1)
     return wrapper
