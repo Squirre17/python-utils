@@ -1,3 +1,4 @@
+from loguru import logger
 from squ.utils.color import Color
 import sys
 import traceback
@@ -10,13 +11,15 @@ def info(msg, end = "\n"):
 
 in_debug = True
 
-def dbg(msg, end = "\n"):
-    if in_debug:
-        prompt = Color.colorify("[#]" ,"purple")
-        body   = " DBG   : "
-        print(prompt + body, end = "")
-        print(msg, end = end)
-    else : pass
+# def dbg(msg, end = "\n"):
+#     if in_debug:
+#         prompt = Color.colorify("[#]" ,"purple")
+#         body   = " DBG   : "
+#         print(prompt + body, end = "")
+#         print(msg, end = end)
+#     else : pass
+
+dbg = logger.debug
 
 def err(msg, end = "\n"):
     prompt = Color.colorify("[$]" ,"red")
