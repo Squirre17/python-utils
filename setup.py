@@ -14,7 +14,8 @@ setup(
     install_requires=[
         "typing",
         "functools",
-        "loguru"
+        "loguru",
+        "rich"
     ],
     entry_points={}
 )
