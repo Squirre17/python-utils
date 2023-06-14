@@ -2,6 +2,8 @@ from loguru import logger
 from squ.utils.color import Color
 import sys
 import traceback
+from squ.utils.exit import elegant_exit
+
 
 def info(msg, end = "\n"):
     prompt = Color.colorify("[+]" ,"green")
@@ -19,7 +21,9 @@ in_debug = True
 #         print(msg, end = end)
 #     else : pass
 
-dbg = logger.debug
+import squ.gdb.stdio
+with squ.gdb.stdio.stdio:
+    dbg = logger.debug
 
 def err(msg, end = "\n"):
     prompt = Color.colorify("[$]" ,"red")
