@@ -1,4 +1,7 @@
-from loguru import logger
+import squ.gdb.stdio
+with squ.gdb.stdio.stdio:
+    from loguru import logger
+    
 from squ.utils.color import Color
 import sys
 import traceback
