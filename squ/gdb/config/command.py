@@ -10,6 +10,10 @@ import collections
 import gdb
 from loguru import logger
 
+from squ.utils.decorator import handle_exception
+from squ.gdb.stdio import stdio
+from squ.gdb.sysargv import SysArgvContext
+
 
 # TODO : ction: Command.complete (text, word) https://sourceware.org/gdb/onlinedocs/gdb/CLI-Commands-In-Python.html
 
@@ -81,6 +85,15 @@ class Command(gdb.Command):
                 log.fatal("Notimplement {}".format(attr))
         
         assert type(getattr(cls, "examples")) is list
+
+    @handle_exception
+    def invoke(self, args: str, from_tty: bool) -> None:
+        with stdio:
+            with SysArgvContext(self.cmdname, args):
+                try:
+                    self.do_invoke()
+                except SystemExit:
+                    pass
 
     # def complete(self, arguline: str, last: str):
     #     # https://stackoverflow.com/questions/41704089/programmatic-gdb-completer-interface-via-python
