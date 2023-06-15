@@ -6,7 +6,7 @@ import gdb
 import string
 
 import squ.utils.log  as log
-import squ.gdb.memory as memory
+# import squ.gdb.memory as memory
 import squ.gdb.arch as arch
 import squ.gdb.proc as proc
 
@@ -27,21 +27,26 @@ from squ.utils.exit import elegant_exit
 
 class MemReader:
 
-    @proc.only_if_running
-    def int(addr : Address, size : int = 8) -> int :
+    def __init__(self) -> None:
+        pass
+
+    # @proc.only_if_running
+    # @handle_exception
+    def u64(self, addr : Address, size : int = 8) -> int :
 
         assert size > 0 and size <= 8, "size error"
         
         try :
             val : memoryview = gdb.selected_inferior().read_memory(addr, size)
         except Exception as e :
-            elegant_exit()
+            raise e
+            log.fatal(e)
         
         # do arch convert here ,ease the burden of upstream functions
         return int.from_bytes(bytearray(val), arch.endianness)
 
     @proc.only_if_running
-    def bytes(addr : Address, size = 8) -> bytes:
+    def bytes(self, addr : Address, size = 8) -> bytes:
         '''
         internal use ,don't expose it
         '''
@@ -52,7 +57,7 @@ class MemReader:
         Value.cast (type): hat is the result of casting this instance to the type ,type must be a `gdb.Type` object. 
         Value.dereference(): get content of given addr
     '''
-    def by_type(addr, gdb_type) -> int:
+    def by_type(self, addr, gdb_type) -> int:
         value = gdb.Value(addr)
         try:
             value = value.cast(gdb_type)
@@ -63,13 +68,13 @@ class MemReader:
 
     max_string_len = 48
 
-    def string(addr : int, maxlen = int(max_string_len)) -> Optional[str] :
+    def string(self, addr : int, maxlen = int(max_string_len)) -> Optional[str] :
         '''
         only support ascii encode now
         '''
 
         try :
-            mem_bytes = reader.bytes(addr, maxlen)
+            mem_bytes = self.bytes(addr, maxlen)
         except gdb.error:
             logger.error(f"Can't read at '{addr:#x}'")
             return None
@@ -95,7 +100,7 @@ class MemReader:
 reader = MemReader()
 
 class MemWriter:
-    def write(addr : int, size : int, value : Union[int, str, bytes]) -> None :
+    def write(self, addr : int, size : int, value : Union[int, str, bytes]) -> None :
         assert size > 0 and size <= 8, "size error"
         if isinstance(value, int) :
             # TODO: Considering byte order according to arch
@@ -123,7 +128,7 @@ def can_access(addr : int) -> bool:
     check whether accessible in given memory address
     '''
     try : 
-        reader.int(addr, 1)
+        reader.u64(addr, 1)
         return True
     except : 
         return False

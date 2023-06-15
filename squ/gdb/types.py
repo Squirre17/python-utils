@@ -12,8 +12,9 @@ u16 = gdb.lookup_type('unsigned short')
 u32 = gdb.lookup_type('unsigned int')
 u64 = gdb.lookup_type('unsigned long long')
 
-void  = gdb.lookup_type('void')
-voidp = void.pointer()
+void   = gdb.lookup_type('void')
+voidp  = void.pointer()
+voidpp = voidp.pointer()
 
 i8p  = i8.pointer() 
 i16p = i16.pointer()

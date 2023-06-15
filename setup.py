@@ -15,7 +15,9 @@ setup(
         "typing",
         "functools",
         "loguru",
-        "rich"
+        "rich",
+        "elftools",
+        "pygments"
     ],
     description="gdb wrapper & other useful code snippet",
     entry_points={}
