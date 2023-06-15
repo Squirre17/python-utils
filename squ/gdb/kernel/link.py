@@ -32,7 +32,7 @@ arrow_left = Color.purpleify('←')
 
 arrow_right = Color.purpleify('→')
 
-recur_depth = 3
+recur_depth = 5
 
 
 
@@ -88,6 +88,7 @@ return : [0x7ffff7de2083]
 
 because : 0x7fffffffd938 → 0x7ffff7de2083
 '''
+import pdb
 def __recur_deref(addr : int, depth = recur_depth) -> List[int]:
     '''
     recursively dereference a address, return a list of addresses.
@@ -151,7 +152,7 @@ def generate(addr: int, depth = int(recur_depth)) -> str:
 
         symbol : Symbol = squ.gdb.symbol.get(addr)
         if symbol :
-            res = "%s %s" %(addr, str(symbol))
+            res = "%#x %s" %(addr, str(symbol))
             # res = M.dyetext(res, addr)
         else:
             res = R("{:#x}".format(addr))
