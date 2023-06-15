@@ -147,11 +147,12 @@ def poke():
 
 @proc.only_if_running
 # TODO: experimental
-def deref(addr : int, type : gdb.Type) -> gdb.Value:
+def deref(addr : int, as_type : gdb.Type) -> gdb.Value:
     """
     Read one ``gdb.Type`` object at the specified address.
     """
-    return gdb.Value(addr).cast(type.pointer()).dereference()
+    assert type(addr) is int
+    return gdb.Value(addr).cast(as_type.pointer()).dereference()
 
 def page_align():
     raise NotImplementedError

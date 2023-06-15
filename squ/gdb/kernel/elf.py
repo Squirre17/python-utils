@@ -26,6 +26,6 @@ def get_text_section_info() -> Tuple[int, int]:
             if sec.name == ".text":
                 offset = s["sh_offset"]
                 start  = s["sh_addr"]
-            return (start, offset)
+                return (start, offset)
             
         log.fatal("can't found .text section in vmlinux {}".format(progspace.filename))

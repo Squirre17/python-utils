@@ -30,13 +30,13 @@ R = Color.redify
 
 arrow_left = Color.purpleify('←')
 
-arrow_right = Color.purpleify('→'),
+arrow_right = Color.purpleify('→')
 
 recur_depth = 3
 
 
 
-def __last_entry(addr_or_data : int) -> str:
+def __last_entry(addr : int) -> str:
     '''
     if a address is last entry of chain, 
     use left arrow and data or disasm or string.
@@ -45,17 +45,17 @@ def __last_entry(addr_or_data : int) -> str:
     ◂— '/home/squ/prac/a.out'
     ◂— 0x100000000
     '''
-    symbol : Symbol = squ.gdb.symbol.get(addr_or_data) 
+    symbol : Symbol = squ.gdb.symbol.get(addr) 
 
-    readable = mem.can_access(addr_or_data)
+    readable = mem.can_access(addr)
     
     # if non-readable, `addr_or_data` is a only data
     if not readable:
-        data = mem.reader.u64(addr_or_data)
-        return str(arrow_left) + " %#x" %(data)
+        data = mem.reader.u64(addr)
+        return arrow_left + " %#x" %(data)
     
     else:
-        addr = Address(addr_or_data)
+        addr = Address(addr)
         #  string 
         '''
         0x7fffffffd993 ◂— '/home/squ/prac/a.out'
@@ -63,7 +63,7 @@ def __last_entry(addr_or_data : int) -> str:
         '''
         string = mem.reader.string(addr)
         if string is not None:
-            return str(arrow_left) + " " + '\'' + Color.boldify(string) + '\''
+            return arrow_left + " " + '\'' + Color.boldify(string) + '\''
 
         # instruction
         # like : 0x4012dc <main+0> ← endbr64
@@ -75,11 +75,11 @@ def __last_entry(addr_or_data : int) -> str:
                 log.dbg("%s %s" % (inst.mnem, inst.operand))
             else:
                 raise NotImplementedError
-            return str(arrow_left) + " " + hl.asm("%s %s" % (inst.mnem, inst.operand))
+            return arrow_left + " " + hl.asm("%s %s" % (inst.mnem, inst.operand))
         
         # simply data
-        data = mem.reader.u64(addr_or_data)
-        return str(arrow_left) + " %#x" %(data)
+        data = mem.reader.u64(addr)
+        return arrow_left + " %#x" % data
 
 
 '''
@@ -91,8 +91,10 @@ because : 0x7fffffffd938 → 0x7ffff7de2083
 def __recur_deref(addr : int, depth = recur_depth) -> List[int]:
     '''
     recursively dereference a address, return a list of addresses.
-    don't including head currently.
+    including head currently. Don't including trailing underefable value
     '''
+
+    assert type(addr) is int
 
     result = []
     for i in range(depth):
@@ -103,7 +105,7 @@ def __recur_deref(addr : int, depth = recur_depth) -> List[int]:
         
         try :
             
-            addr = int(mem.deref(addr, types.voidpp))
+            next_addr = int(mem.deref(addr, types.voidp))
             # TODO: if xor logic exist in hign version (tcache) ,handle it
 
             # cuz derefered result is either data or address, if it's data, handle it latter in __last_entry
@@ -115,12 +117,14 @@ def __recur_deref(addr : int, depth = recur_depth) -> List[int]:
             mask = ((1 << (64)) - 1)
             addr &= mask
             result.append(addr)
+            addr = next_addr
 
-        except gdb.MemeoryError:
-            # TODO: gdb.MemeoryError
+        except gdb.MemoryError:
+            # deref with null or other underefable value
             break
-        except Exception as e:
-            log.fatal(e)
+        # except Exception as e:
+        #     log.dbg(e)
+        #     raise e
     
     return result
 
@@ -129,7 +133,7 @@ def __recur_deref(addr : int, depth = recur_depth) -> List[int]:
 input 0x7fffffffd938 
 0x7fffffffd938 → 0x7ffff7de2083 <__libc_start_main+243> ← mov edi,eax
 '''
-def generate(addr, depth = int(recur_depth)) -> str:
+def generate(addr: int, depth = int(recur_depth)) -> str:
     '''
     generate a line of address chain, don't with prefix.
     '''
@@ -140,7 +144,8 @@ def generate(addr, depth = int(recur_depth)) -> str:
     0x7fffffffd590 ◂— 0x100000000
     '''
     addrs  : List[int] = __recur_deref(addr ,depth) # tuple is more proper??
-    result : List[str] = [R("{:#x}".format(addr))]
+    # result : List[str] = [R("{:#x}".format(addr))]
+    result : List[str] = []
 
     for addr in addrs:
 
@@ -149,13 +154,13 @@ def generate(addr, depth = int(recur_depth)) -> str:
             res = "%s %s" %(addr, str(symbol))
             # res = M.dyetext(res, addr)
         else:
-            res = "{:#x}".format(addr)
+            res = R("{:#x}".format(addr))
         
         result.append(res)
         
         # TODO: colorify it
         
-    result : str = (" " + str(arrow_right) + " ").join(result)
+    result : str = (" " + arrow_right + " ").join(result)
 
     if len(addrs) == 0:
         padding = __last_entry(addr)
